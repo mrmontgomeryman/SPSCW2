@@ -1,5 +1,7 @@
 training = imageDatastore('/Users/Will/Documents/SPS/CW2/characters', 'IncludeSubfolders', true, 'LabelSource', 'foldernames');
-
+test = imageDatastore('/Users/Will/Documents/SPS/CW2/Test_characters', 'IncludeSubfolders', true, 'LabelSource', 'foldernames');
+image = readimage(training, 35);
+% imagesc(image);
 % Calculate average vertical elements
 magVertT = zeros(10,2);
 for t = 13:22
@@ -87,12 +89,13 @@ for t = 23:32
     for u = 0:200
         for v = 320:640       
             if(abs(u-200)^2 + (v-320)^2 < 50^2)  
-                if(atan(abs(u-200)/(v-320)) > 20*(pi/180) && atan(abs(u-200)/(v-320)) < 30*(pi/180)) 
+                if(atan(abs(u-200)/(v-320)) > 10*(pi/180) && atan(abs(u-200)/(v-320)) < 50*(pi/180)) 
                     filtered(u,v) = Y(u,v);
                 end
             end
         end
     end
+    
     s = t-12;
     magV(s,1) = t;
     magV(s,2) = sum(sum(filtered.^2)); 
@@ -112,7 +115,7 @@ for x = 3:32
     for u = 0:200
         for v = 320:640       
             if(abs(u-200)^2 + (v-320)^2 < 50^2)  
-                if(atan(abs(u-200)/(v-320)) > 20*(pi/180) && atan(abs(u-200)/(v-320)) < 30*(pi/180)) 
+                if(atan(abs(u-200)/(v-320)) > 10*(pi/180) && atan(abs(u-200)/(v-320)) < 50*(pi/180)) 
                     filtered(u,v) = Y(u,v);
                 end
             end
@@ -123,8 +126,6 @@ for x = 3:32
 end
 
 % scatter(percentT(:,2), percentV(:,2));
-% xlabel('T Percent');
-% ylabel('V Percent');
 
 Z = horzcat(percentT(:,2), percentV(:,2));
 [idx,C] = kmeans(Z, 3);
@@ -135,4 +136,7 @@ scatter(Z(idx == 2, 1), Z(idx == 2, 2), sz,  'g', 'filled');
 hold on
 scatter(Z(idx == 3, 1), Z(idx == 3, 2), sz,  'b', 'filled');
 hold on
+voronoi(C(:,1), C(:,2));
 
+xlabel('T Percent');
+ylabel('V Percent');
