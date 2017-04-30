@@ -4,7 +4,7 @@ training = imageDatastore('/Users/jacobmontgomery/University/Year2/SPS/SPSCW2/ch
 % imagesc(image);
 % Calculate average vertical elements
 magVertT = zeros(11,2);
-for t = 13:22
+for t = 2
 
     X = readimage(training, t);
     z = fft2(double(X));
@@ -19,7 +19,7 @@ for t = 13:22
         end
     end
     
-    s = t-11;
+    s = t;
     magVertT(s,1) = t;
     magVertT(s,2) = sum(sum(filtered.^2)); 
 end
@@ -29,7 +29,7 @@ avgVertT = avgVertT(1,2);
 
 % Calculate average horizontal elements
 magHorT = zeros(11,2);
-for t = 13:22
+for t = 2
 
     X = readimage(training, t);
     z = fft2(double(X));
@@ -44,7 +44,7 @@ for t = 13:22
         end
     end
     
-    s = t-11;
+    s = t;
     magHorT(s,1) = t;
     magHorT(s,2) = sum(sum(filtered.^2)); 
 end
@@ -54,7 +54,7 @@ avgHorT = avgHorT(1,2);
 
 
 percentT = zeros(30,2);
-for x = 3:32
+for x = 1:2
     X = readimage(training, x);
     z = fft2(double(X));
     q = fftshift(z);
@@ -73,12 +73,12 @@ for x = 3:32
                 filtered2(u,v) = Y(u,v);        
         end
     end
-    percentT(x-2,2) = ((sum(sum(filtered.^2))) + (sum(sum(filtered2.^2))))/(avgVertT+avgHorT);
+    percentT(x,2) = ((sum(sum(filtered.^2))) + (sum(sum(filtered2.^2))))/(avgVertT+avgHorT);
 end
 
 % Calculate average V, Needs to be improved
 magV = zeros(10,2);
-for t = 23:32
+for t = 2
 
     X = readimage(training, t);
     z = fft2(double(X));
@@ -96,7 +96,7 @@ for t = 23:32
         end
     end
     
-    s = t-11;
+    s = t;
     magV(s,1) = t;
     magV(s,2) = sum(sum(filtered.^2)); 
 end
@@ -105,7 +105,7 @@ avgV = sum(magV);
 avgV = avgV(1,2);
 
 percentV = zeros(30,2);
-for x = 3:32
+for x = 1:2
     X = readimage(training, x);
     z = fft2(double(X));
     q = fftshift(z);
@@ -122,7 +122,7 @@ for x = 3:32
         end
     end
     
-    percentV(x-2,2) = sum(sum(filtered.^2))/avgV;
+    percentV(x,2) = sum(sum(filtered.^2))/avgV;
 end
 
 % scatter(percentT(:,2), percentV(:,2));
@@ -132,10 +132,10 @@ Z = horzcat(percentT(:,2), percentV(:,2));
 sz = 20;
 scatter(Z(idx == 1, 1), Z(idx == 1, 2), sz, 'r', 'filled');
 hold on
-scatter(Z(idx == 2, 1), Z(idx == 2, 2), sz,  'g', 'filled');
-hold on
-scatter(Z(idx == 3, 1), Z(idx == 3, 2), sz,  'b', 'filled');
-hold on
+%scatter(Z(idx == 2, 1), Z(idx == 2, 2), sz,  'g', 'filled');
+%hold on
+%scatter(Z(idx == 3, 1), Z(idx == 3, 2), sz,  'b', 'filled');
+%hold on
 voronoi(C(:,1), C(:,2));
 
 xlabel('T Percent');
