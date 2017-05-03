@@ -50,7 +50,6 @@ end
 avgHorT = sum(magHorT);
 avgHorT = avgHorT(1,2);
 
-
 percentT = zeros(30,2);
 for x = 3:32
     X = readimage(training, x);
@@ -139,8 +138,8 @@ hold on
 
 % Classify test data
 
-percentT = zeros(3,2);
-for x = 33:35
+percentT = zeros(4,2);
+for x = 33:36
     X = imbinarize(rgb2gray(readimage(training, x)));
     z = fft2(double(X));
     q = fftshift(z);
@@ -162,8 +161,8 @@ for x = 33:35
     percentT(x-32,2) = ((sum(sum(filtered.^2))) + (sum(sum(filtered2.^2))))/(avgVertT+avgHorT);
 end
 
-percentV = zeros(3,2);
-for x = 33:35
+percentV = zeros(4,2);
+for x = 33:36
     X = imbinarize(rgb2gray(readimage(training, x)));
     z = fft2(double(X));
     q = fftshift(z);
@@ -183,5 +182,19 @@ for x = 33:35
     percentV(x-32,2) = sum(sum(filtered.^2))/avgV;
 end
 
+% A contains the created test points T and V values.
 A = horzcat(percentT(:,2), percentV(:,2));
-scatter(percentT(:,2), percentV(:,2), sz, 'm', 'filled');
+idx = knnsearch(createns(Z), A);
+TestLabels = char(zeros(4,1));
+for i = 1:length(idx)
+    if (idx(i) <10)
+        TestLabels(i) = 'S';
+    else
+        if (idx(i) > 20)
+            TestLabels(i) = 'V';
+        else
+            TestLabels(i) = 'T';
+        end
+    end       
+end
+        scatter(percentT(:,2), percentV(:,2), sz, 'm', 'filled');
