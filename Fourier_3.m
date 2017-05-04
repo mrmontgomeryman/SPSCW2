@@ -1,7 +1,6 @@
-clear all;
 close all;
 training = imageDatastore('/Users/Will/Documents/SPS/CW2/characters', 'IncludeSubfolders', true, 'LabelSource', 'foldernames');
-
+test = imageDatastore('/Users/Will/Documents/SPS/CW2/Testcharacters', 'IncludeSubfolders', true, 'LabelSource', 'foldernames');
 % Calculate average vertical elements
 magVertT = zeros(10,2);
 for t = 13:22
@@ -140,11 +139,10 @@ for x = 1:30
     end
 end
 
-classifier = fitcknn(Z,B); 
-[idx,C] = kmeans(Z, 3);
+%create knn classifier.
+classifier = fitcknn(Z,B);
 sz = 20;
 figure;
-
 % Plotting decision boundaries.
 xrange = [0.07 0.11];
 yrange = [0.06 0.13];
@@ -159,23 +157,21 @@ hold on;
 cmap = [1 0.8 0.8; 0.95 1 0.95; 0.9 0.9 1];
 colormap(cmap);
 
-scatter(Z(idx == 1, 1), Z(idx == 1, 2), sz, 'r', 'filled');
+scatter(Z(B == 'S', 1), Z(B == 'S', 2), sz, 'r', 'filled');
 hold on
-scatter(Z(idx == 2, 1), Z(idx == 2, 2), sz,  'g', 'filled');
+scatter(Z(B == 'T', 1), Z(B == 'T', 2), sz,  'g', 'filled');
 hold on
-scatter(Z(idx == 3, 1), Z(idx == 3, 2), sz,  'b', 'filled');
+scatter(Z(B == 'V', 1), Z(B == 'V', 2), sz,  'b', 'filled');
 hold on
 
 xlabel('T Percent');
 ylabel('V Percent');
 hold on
 
-
-
 % Extract features of test data
-percentT = zeros(4,2);
-for x = 33:36
-    X = imbinarize(rgb2gray(readimage(training, x)));
+percentT = zeros(9,2);
+for x = 1:9
+    X = imbinarize(rgb2gray(readimage(test, x)));
     z = fft2(double(X));
     q = fftshift(z);
     Y = log(abs(q)+1);
@@ -193,12 +189,12 @@ for x = 33:36
                 filtered2(u,v) = Y(u,v);        
         end
     end
-    percentT(x-32,2) = ((sum(sum(filtered.^2))) + (sum(sum(filtered2.^2))))/(avgVertT+avgHorT);
+    percentT(x,2) = ((sum(sum(filtered.^2))) + (sum(sum(filtered2.^2))))/(avgVertT+avgHorT);
 end
 
-percentV = zeros(4,2);
-for x = 33:36
-    X = imbinarize(rgb2gray(readimage(training, x)));
+percentV = zeros(9,2);
+for x = 1:9
+    X = imbinarize(rgb2gray(readimage(test, x)));
     z = fft2(double(X));
     q = fftshift(z);
     Y = log(abs(q)+1);
@@ -214,11 +210,15 @@ for x = 33:36
         end
     end
     
-    percentV(x-32,2) = sum(sum(filtered.^2))/avgV;
+    percentV(x,2) = sum(sum(filtered.^2))/avgV;
 end
 
 % A contains the created test points T and V values.
 A = horzcat(percentT(:,2), percentV(:,2));
-%TestLabels = char(zeros(4,1));
 TestLabels = predict(classifier, A);
-% scatter(percentT(:,2), percentV(:,2), sz, 'm', 'filled');
+scatter(A(TestLabels == 'S', 1), A(TestLabels == 'S', 2), sz, 'r', 'filled');
+hold on
+scatter(A(TestLabels == 'T', 1), A(TestLabels == 'T', 2), sz,  'g', 'filled');
+hold on
+scatter(A(TestLabels == 'V', 1), A(TestLabels == 'V', 2), sz,  'b', 'filled');
+hold on
